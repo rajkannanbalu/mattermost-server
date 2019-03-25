@@ -111,12 +111,6 @@ func getUser(c *Context, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := c.App.GetUser(c.Params.UserId)
-	if err != nil {
-		c.Err = err
-		return
-	}
-
 	canSee, err := c.App.UserCanSeeOtherUser(c.App.Session.UserId, c.Params.UserId)
 	if err != nil {
 		c.Err = err
@@ -125,6 +119,12 @@ func getUser(c *Context, w http.ResponseWriter, r *http.Request) {
 
 	if !canSee {
 		c.SetPermissionError(model.PERMISSION_VIEW_MEMBERS)
+		return
+	}
+
+	user, err := c.App.GetUser(c.Params.UserId)
+	if err != nil {
+		c.Err = err
 		return
 	}
 
@@ -152,6 +152,15 @@ func getUserByUsername(c *Context, w http.ResponseWriter, r *http.Request) {
 
 	user, err := c.App.GetUserByUsername(c.Params.Username)
 	if err != nil {
+		restrictions, err2 := c.App.GetViewUsersRestrictions(c.App.Session.UserId)
+		if err2 != nil {
+			c.Err = err2
+			return
+		}
+		if restrictions != nil {
+			c.SetPermissionError(model.PERMISSION_VIEW_MEMBERS)
+			return
+		}
 		c.Err = err
 		return
 	}
@@ -196,6 +205,15 @@ func getUserByEmail(c *Context, w http.ResponseWriter, r *http.Request) {
 
 	user, err := c.App.GetUserByEmail(c.Params.Email)
 	if err != nil {
+		restrictions, err2 := c.App.GetViewUsersRestrictions(c.App.Session.UserId)
+		if err2 != nil {
+			c.Err = err2
+			return
+		}
+		if restrictions != nil {
+			c.SetPermissionError(model.PERMISSION_VIEW_MEMBERS)
+			return
+		}
 		c.Err = err
 		return
 	}
@@ -228,13 +246,7 @@ func getDefaultProfileImage(c *Context, w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	user, err := c.App.GetUser(c.Params.UserId)
-	if err != nil {
-		c.Err = err
-		return
-	}
-
-	canSee, err := c.App.UserCanSeeOtherUser(c.App.Session.UserId, user.Id)
+	canSee, err := c.App.UserCanSeeOtherUser(c.App.Session.UserId, c.Params.UserId)
 	if err != nil {
 		c.Err = err
 		return
@@ -242,6 +254,12 @@ func getDefaultProfileImage(c *Context, w http.ResponseWriter, r *http.Request) 
 
 	if !canSee {
 		c.SetPermissionError(model.PERMISSION_VIEW_MEMBERS)
+		return
+	}
+
+	user, err := c.App.GetUser(c.Params.UserId)
+	if err != nil {
+		c.Err = err
 		return
 	}
 
@@ -262,13 +280,7 @@ func getProfileImage(c *Context, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := c.App.GetUser(c.Params.UserId)
-	if err != nil {
-		c.Err = err
-		return
-	}
-
-	canSee, err := c.App.UserCanSeeOtherUser(c.App.Session.UserId, user.Id)
+	canSee, err := c.App.UserCanSeeOtherUser(c.App.Session.UserId, c.Params.UserId)
 	if err != nil {
 		c.Err = err
 		return
@@ -276,6 +288,12 @@ func getProfileImage(c *Context, w http.ResponseWriter, r *http.Request) {
 
 	if !canSee {
 		c.SetPermissionError(model.PERMISSION_VIEW_MEMBERS)
+		return
+	}
+
+	user, err := c.App.GetUser(c.Params.UserId)
+	if err != nil {
+		c.Err = err
 		return
 	}
 
